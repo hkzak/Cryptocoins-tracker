@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Crypto Coins App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.30/vue.global.min.js"></script>
+
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-8 mx-auto mt-5">
+        <h3 class="mb-5">
+          Crypto Currencies
+        </h3>
+
+{% verbatim %}
+
+<div id="app">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Rank</th>
+        <th scope="col">Name</th>
+        <th scope="col">Price USD</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr v-for="coin in coins" :ket="coin.id">
+          <td class="align-middle">{{ coin.rank }}</td>
+          <td class="align-middle">
+            <img :src="coin.image" alt="image" class="px-2" width="50">
+            {{ coin.name }}
+            <small class="text-muted px-2">{{ coin.symbol }}</small>
+          </td>
+          <td class="align-middle" :class="{'raise': coin.state === 'raise', 'fall': coin.state === 'fall'}">{{ coin.price }}</td>
+    </tbody>
+  </table>
+</div>
+
+{% endverbatim %}
+      </div>
+    </div>
+  </div>
+  <script>
+    const { createApp } = Vue;
+    const app = createApp({
+      data() {
+        return {
+          coin: 'just a coin',
+          coins: null
+        }
+      },
+      created(){
+        const socket = new WebSocket('ws://localhost:8000/ws/coins/');
+
+        let _this = this;
+
+        socket.onmessage = function(event){
+          _this.coins = JSON.parse(event.data)
+          console.log(_this.coins)
+        }
+      } 
+    });
+    app.mount("#app");
+  </script>
+</body>
+</html>
